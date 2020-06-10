@@ -2,6 +2,7 @@
   "presets": ["@babel/preset-env", "@babel/preset-react"],
   "plugins": [
     ["@babel/plugin-proposal-object-rest-spread", { "loose": true, "useBuiltIns": true }],
+    "@babel/plugin-transform-react-jsx",
     "syntax-dynamic-import",
     ["@babel/plugin-proposal-decorators", { "legacy": true }]
   ]

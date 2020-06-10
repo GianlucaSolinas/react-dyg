@@ -1,12 +1,12 @@
 {
   "name": "react-dyg",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
-  "main": "dist/app.bundle.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "version": "node ./scripts/version.js",
-    "build": "NODE_ENV=production webpack -p",
+    "build": "NODE_ENV=production webpack",
     "watch": "webpack --progress --watch",
     "start": "NODE_ENV=development && webpack-dashboard -- webpack-dev-server --open --port=8080",
     "lint:js": "eslint src/ --cache",
