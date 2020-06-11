@@ -1,6 +1,6 @@
 {
   "name": "react-dyg",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
   "main": "./dist/index.js",
   "scripts": {
@@ -65,6 +65,12 @@
     "react-jss": "^10.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "wretch": "^1.7.2"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-jss": "^10.2.0",
     "wretch": "^1.7.2"
   },
   "cca": {
