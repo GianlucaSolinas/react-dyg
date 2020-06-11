@@ -1,6 +1,6 @@
 {
   "name": "react-dyg",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
   "main": "./dist/index.js",
   "scripts": {
@@ -46,28 +46,15 @@
     "webpack-cleanup-plugin": "^0.5.1",
     "webpack-cli": "^3.3.11",
     "webpack-dashboard": "^3.2.0",
+    "create-component-app": "^1.7.0",
     "webpack-dev-server": "^3.11.0"
   },
-  "dependencies": {
+  "dependencies": {},
+  "peerDependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
-    "create-component-app": "^1.7.0",
     "dygraphs": "^2.1.0",
-    "i18next": "^19.4.5",
-    "i18next-xhr-backend": "^3.2.2",
-    "jss": "^10.2.0",
-    "jss-global": "^3.0.0",
-    "jss-plugin-camel-case": "^10.2.0",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-i18next": "^11.5.0",
-    "react-jss": "^10.2.0",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
-    "wretch": "^1.7.2"
-  },
-  "peerDependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-jss": "^10.2.0",
