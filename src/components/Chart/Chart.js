@@ -20,7 +20,9 @@ const Chart = ({ data, advanced }) => {
         new Dygraph(
           graphContainer.current,
           data,
-          advanced ? { ...getChartOptions({ labelsDiv }) } : { ...getSimpleOptions({ labelsDiv }) }
+          advanced
+            ? { ...getChartOptions({ labelsDiv, ...advanced }) }
+            : { ...getSimpleOptions({ labelsDiv }) }
         )
       );
 

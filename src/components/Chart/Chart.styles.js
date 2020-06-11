@@ -6,7 +6,7 @@ const Styles = {
     position: 'absolute',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     zIndex: '999 !important',
-    minWidth: '15%'
+    minWidth: '30%'
   }
 };
 
