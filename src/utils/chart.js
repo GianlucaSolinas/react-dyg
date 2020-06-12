@@ -8,12 +8,11 @@ import moment from 'moment';
 // import Utils from '../../../../config/utils';
 // import memoizeOne from 'memoize-one';
 // import AgronomeetStore from '../../../client/store';
-// import ChartLegendModal from './legend/legend_modal';
 import ChartLegendModal from '../components/ChartLegendModal/ChartLegendModal';
 
 const ChartUtils = {
   getDefaultOptions: (timezone /*chartOptions*/) => {
-    // let legend_id = 12345678;
+    // let legend_id = 12345678; //get random id
     return {
       drawHighlightPointCallback: function(g, name, ctx, cx, cy, color, radius) {
         ctx.beginPath();

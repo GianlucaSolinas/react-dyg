@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { chartPropTypes } from '@utils/proptypes';
 import useStyles from './Chart.styles';
 
 import Dygraph from 'dygraphs';
@@ -53,8 +53,7 @@ const Chart = ({ data, options }) => {
 };
 
 Chart.propTypes = {
-  data: PropTypes.array,
-  options: PropTypes.object
+  ...chartPropTypes
 };
 
 export default Chart;

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import useStyles from './SingleChart.styles';
 import classnames from 'classnames';
 
 import Dygraph from 'dygraphs';
 import getSimpleOptions from '@utils/simple_options';
+import { chartPropTypes } from '@utils/proptypes';
 
 const SingleChart = ({ data, options }) => {
   const classes = useStyles();
@@ -56,8 +56,7 @@ const SingleChart = ({ data, options }) => {
 };
 
 SingleChart.propTypes = {
-  data: PropTypes.array,
-  options: PropTypes.object
+  ...chartPropTypes
 };
 
 export default SingleChart;
