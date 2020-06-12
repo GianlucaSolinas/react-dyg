@@ -293,7 +293,7 @@ const getChartOptions = ({ labelsDiv }) => {
     // },
     // ...(timezone && {
     //   title: `TIMEZONE: UTC ${moment.tz(timezone).format('Z')}`,
-    //   titleHeight: 25
+    // titleHeight: 25
     // })
   };
 };

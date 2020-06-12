@@ -2,13 +2,16 @@ import ChartUtils from '@utils/chart';
 import moment from 'moment';
 import Dygraph from 'dygraphs';
 
-const getSimpleOptions = ({ labelsDiv }) => {
+const getSimpleOptions = ({ labelsDiv, chart_type, title, labels, ...rest }) => {
   return {
     ...ChartUtils.getDefaultOptions(),
-    labels: ['Date', 'value'],
+    labels: labels || ['Date', 'value'],
     labelsDiv: labelsDiv.current,
     labelsUTC: true,
     connectSeparatedPoints: true,
+    ...(title && { title: title, titleHeight: 25 }),
+    ...(chart_type === 'column' && { plotter: ChartUtils.barChartPlotter }),
+    ...rest,
     //   pointClickCallback: (event, p) => {
     //     if (this.props.disabled) return;
     //     if (this.props.onTimeValid) {

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import useStyles from './Chart.styles';
+import useStyles from './SingleChart.styles';
+import classnames from 'classnames';
 
 import Dygraph from 'dygraphs';
-import getChartOptions from '@utils/options';
+import getSimpleOptions from '@utils/simple_options';
 
-const Chart = ({ data, options }) => {
+const SingleChart = ({ data, options }) => {
   const classes = useStyles();
 
   const [chart, setChart] = useState(null);
@@ -17,7 +18,9 @@ const Chart = ({ data, options }) => {
   useEffect(() => {
     if (graphContainer && data.length) {
       setChart(
-        new Dygraph(graphContainer.current, data, { ...getChartOptions({ labelsDiv, ...options }) })
+        new Dygraph(graphContainer.current, data, {
+          ...getSimpleOptions({ labelsDiv, ...options })
+        })
       );
 
       if (chart) {
@@ -33,9 +36,10 @@ const Chart = ({ data, options }) => {
   let legendClass = 'legend_hover';
 
   return (
-    <div className={classes.container}>
+    <div className={classnames(classes.container)}>
       <div className="chart_container_graph">
         <div
+          className={classes.graphStyles}
           ref={graphContainer}
           style={{
             height: chart ? '400px' : '0',
@@ -43,18 +47,17 @@ const Chart = ({ data, options }) => {
             margin: '0 auto',
             width: 'auto'
           }}
-          className={classes.graphStyles}
         />
         <div className={classes[legendClass]} ref={labelsDiv} style={chart ? {} : { opacity: 0 }} />
       </div>
-      {hiddenGraph && <div>No data available for any serie</div>}
+      {hiddenGraph && <div>Data is not available or the serie is empty</div>}
     </div>
   );
 };
 
-Chart.propTypes = {
+SingleChart.propTypes = {
   data: PropTypes.array,
   options: PropTypes.object
 };
 
-export default Chart;
+export default SingleChart;

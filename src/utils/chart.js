@@ -44,12 +44,26 @@ const ChartUtils = {
       yRangePad: 15,
       drawGapEdgePoints: true,
       highlightSeriesBackgroundAlpha: 0.3,
-      animatedZooms: true
+      animatedZooms: true,
       // showRangeSelector: true,
       // showInRangeSelector: true,
       // rangeSelectorPlotFillColor: '#21b97d',
       // rangeSelectorPlotFillGradientColor: '#7ac746',
-      // rangeSelectorPlotStrokeColor: '#000'
+      // rangeSelectorPlotStrokeColor: '#000',
+      underlayCallback: (canvas, area, dygraph) => {
+        var future_coords = dygraph.toDomCoords(new Date(moment().unix() * 1000).getTime(), 0);
+
+        var splitX = future_coords[0];
+
+        // The drawing area doesn't start at (0, 0), it starts at (area.x, area.y).
+        // That's why we subtract them from splitX and splitY. This gives us the
+        // actual distance from the upper-left hand corder of the graph itself.
+        var leftSideWidth = splitX - area.x;
+        var rightSideWidth = area.w - leftSideWidth;
+
+        canvas.fillStyle = '#f2f2f2';
+        canvas.fillRect(splitX, area.y, rightSideWidth, canvas.canvas.clientHeight);
+      }
     };
   },
   barChartPlotter(e) {

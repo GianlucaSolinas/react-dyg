@@ -1,6 +1,6 @@
 {
   "name": "react-dyg",
-  "version": "1.0.71",
+  "version": "1.0.8",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
   "main": "./dist/index.js",
   "scripts": {
@@ -51,6 +51,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
+    "jss-plugin-compose": "^10.3.0",
     "@fortawesome/fontawesome": "^1.1.8",
     "dygraphs": "^2.1.0",
     "moment": "^2.26.0",
@@ -58,6 +59,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-jss": "^10.2.0",
+    "classnames": "^2.2.6",
     "wretch": "^1.7.2"
   },
   "cca": {
