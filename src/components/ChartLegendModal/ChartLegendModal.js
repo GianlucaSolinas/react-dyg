@@ -42,8 +42,7 @@ const ChartLegendModal = ({ data, timezone = '', parseDateAsString = false }) =>
 ChartLegendModal.propTypes = {
   data: PropTypes.object,
   timezone: PropTypes.string,
-  parseDateAsString: PropTypes.bool,
-  reference: PropTypes.any
+  parseDateAsString: PropTypes.bool
 };
 
 export default ChartLegendModal;

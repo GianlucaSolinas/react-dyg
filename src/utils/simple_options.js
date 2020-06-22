@@ -4,13 +4,14 @@ import Dygraph from 'dygraphs';
 
 const getSimpleOptions = ({ labelsDiv, chart_type, title, labels, ...rest }) => {
   return {
-    ...ChartUtils.getDefaultOptions(),
+    ...ChartUtils.getDefaultOptions({ chart_type }),
     labels: labels || ['Date', 'value'],
     labelsDiv: labelsDiv.current,
     labelsUTC: true,
     connectSeparatedPoints: true,
     ...(title && { title: title, titleHeight: 25 }),
     ...(chart_type === 'column' && { plotter: ChartUtils.barChartPlotter }),
+    ...(chart_type === 'multi_column' && { plotter: ChartUtils.multiColumnBarPlotter }),
     ...rest,
     //   pointClickCallback: (event, p) => {
     //     if (this.props.disabled) return;

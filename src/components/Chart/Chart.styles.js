@@ -3,7 +3,10 @@ import { graphStyles } from '@utils/styles';
 
 const Styles = {
   graphStyles,
-  container: {},
+  container: {
+    width: '80%',
+    display: 'inline-block'
+  },
   legend_hover: {
     position: 'absolute',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',

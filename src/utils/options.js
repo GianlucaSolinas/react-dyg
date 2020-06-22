@@ -2,11 +2,15 @@ import ChartUtils from '@utils/chart';
 import moment from 'moment';
 import Dygraph from 'dygraphs';
 
-const getChartOptions = ({ labelsDiv }) => {
+const getChartOptions = ({ labelsDiv, chart_type, title, labels, dispatch, ...rest }) => {
   return {
-    ...ChartUtils.getDefaultOptions(),
+    ...ChartUtils.getDefaultOptions({ chart_type, dispatch }),
     labelsDiv: labelsDiv.current,
-    labels: ['Date', 'value'],
+    labels: labels || ['Date', 'value'],
+    ...(title && { title: title, titleHeight: 25 }),
+    ...(chart_type === 'column' && { plotter: ChartUtils.barChartPlotter }),
+    ...(chart_type === 'multi_column' && { plotter: ChartUtils.multiColumnBarPlotter }),
+    ...rest,
     // series: series_options,
     // dateWindow: dateWindow
     //   ? dateWindow

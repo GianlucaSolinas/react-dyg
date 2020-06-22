@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import moment from 'moment';
+import useStyles from './ChartLegend.styles';
 // import FullscreenLoader from '../../loader/fullscreenLoader';
-// import AgronomeetStore from '../../../../client/store';
 // import Utils from '../../../../../config/utils';
 
 const memoize = {
@@ -21,7 +21,9 @@ const memoize = {
   }
 };
 
-const ChartLegend = ({ data = {}, legend_id, timezone, chartOptions = {}, sectionAuth }) => {
+const ChartLegend = ({ data = {}, legend_id, timezone, chartOptions = {}, dispatch }) => {
+  const classes = useStyles();
+
   if (!data.x && memoize.get(legend_id)) {
     data = memoize.get(legend_id);
   }
@@ -69,8 +71,8 @@ const ChartLegend = ({ data = {}, legend_id, timezone, chartOptions = {}, sectio
   }
 
   return (
-    <div className="chart_legend relative">
-      {data.series && !Utils.isObjetEmpty(chartOptions) ? (
+    <div className={classes.container}>
+      {data.series /*&& !Utils.isObjetEmpty(chartOptions)*/ ? (
         <Points
           data={data}
           legend_id={legend_id}
@@ -79,26 +81,36 @@ const ChartLegend = ({ data = {}, legend_id, timezone, chartOptions = {}, sectio
           parseDateAsString={parseDateAsString}
           markerDate={markerDate}
           onLabelChange={onLabelChange}
-          sectionAuth={sectionAuth}
+          dispatch={dispatch}
         />
       ) : (
         // <FullscreenLoader text="Loading chart" />
-        <div>Loading...</div>
+        <div>Hover cursor inside chart to show data</div>
       )}
     </div>
   );
+};
+
+ChartLegend.propTypes = {
+  data: PropTypes.object,
+  legend_id: PropTypes.number,
+  timezone: PropTypes.any,
+  chartOptions: PropTypes.object,
+  dispatch: PropTypes.func
 };
 
 const Points = ({
   data,
   legend_id,
   timezone,
-  chartOptions,
+  // chartOptions,
   parseDateAsString,
-  markerDate,
-  onLabelChange,
-  sectionAuth
+  // markerDate,
+  onLabelChange
+  // dispatch
 }) => {
+  // const classes = useStyles();
+
   const { dygraph } = data;
   const [lockedSerie, setLocked] = useState(null);
 
@@ -129,29 +141,30 @@ const Points = ({
 
   return (
     <div className="form_row_margin">
-      <div className="chart_title">
+      {/* <div className={classes.chart_title}>
         <div className="txt_right">
           <small
             className="icon-hover icon-margin"
-            // onClick={() => AgronomeetStore.dispatch({ type: 'DEACTIVATE' })}
+            onClick={() => dispatch({ type: 'DEACTIVATE' })}
           >
             CLOSE
           </small>
         </div>
         <h3>{chartOptions.title}</h3>
         {markerDate && (
-          <div className="chart_dayzero">
+          <div className={classes.dayzero}>
             <small>Day zero: {markerDate}</small>
           </div>
         )}
-      </div>
+      </div> */}
       <div>
         {checkSameValue(data.series).map((v, index) => {
           let style = { color: v.color };
 
-          let linkToSerie = chartOptions.dataseries.find(el => {
-            return el.title === v.label || el.serieLabel === v.label;
-          });
+          // let linkToSerie = chartOptions.dataseries.find(el => {
+          //   return el.title === v.label || el.serieLabel === v.label;
+          // });
+          let linkToSerie = null;
 
           let isHighlighted = v.isHighlighted;
 
@@ -184,8 +197,7 @@ const Points = ({
                     ? data.x
                     : moment.tz(nearestPoint.date, 'DD/MM/YYYY HH:mm Z', timezone).unix(),
                   linkToSerie,
-                  onLabelChange,
-                  sectionAuth
+                  onLabelChange
                 }}
               />
             );
@@ -209,8 +221,7 @@ const Points = ({
                   toggleLock,
                   x: parseDateAsString ? data.x : data.x,
                   linkToSerie,
-                  onLabelChange,
-                  sectionAuth
+                  onLabelChange
                 }}
               />
             );
@@ -219,6 +230,17 @@ const Points = ({
       </div>
     </div>
   );
+};
+
+Points.propTypes = {
+  data: PropTypes.object,
+  legend_id: PropTypes.number,
+  timezone: PropTypes.any,
+  chartOptions: PropTypes.object,
+  dispatch: PropTypes.func,
+  parseDateAsString: PropTypes.any,
+  markerDate: PropTypes.any,
+  onLabelChange: PropTypes.any
 };
 
 const ValueRenderer = ({
@@ -235,8 +257,9 @@ const ValueRenderer = ({
   x,
   linkToSerie
   // onLabelChange,
-  // sectionAuth
 }) => {
+  const classes = useStyles();
+
   const [edit, toggleEdit] = useState(false);
   const [label, editLabel] = useState(data.label);
 
@@ -255,12 +278,11 @@ const ValueRenderer = ({
     // });
   };
 
-  // const readonly = !Utils.checkSectionAuthWrite(sectionAuth);
   const readonly = false;
 
   return (
-    <div key={index} className={'chart_row ' + (isHighlighted ? 'highlighted' : '')}>
-      <div style={style} className="chart_label">
+    <div key={index} className={classNames(classes.chart_row, { highlighted: isHighlighted })}>
+      <div style={style} className={classes.chart_label}>
         {edit ? (
           <div>
             <input
@@ -299,18 +321,18 @@ const ValueRenderer = ({
         )}
       </div>
       {isVisible && (
-        <div className="value_container">
-          <div className="chart_date">
+        <div className={classes.value_container}>
+          <div className={classes.chart_date}>
             {parseDateAsString
               ? data.date
               : moment.tz(data.date, 'DD/MM/YYYY HH:mm Z', timezone).isValid()
               ? moment.tz(data.date, 'DD/MM/YYYY HH:mm Z', timezone).format('DD/MM/YYYY HH:mm')
               : ''}
           </div>
-          <div className="chart_value">{data.value}</div>
+          <div className={classes.chart_value}>{data.value}</div>
         </div>
       )}
-      <div className="actions_container txt_center">
+      <div className={classes.actions_container}>
         {!readonly && (
           <i
             className={classNames('fas icon-hover icon-margin inline_block', {
@@ -347,39 +369,54 @@ const ValueRenderer = ({
   );
 };
 
-const getNearestPoint = (currentDate, data, index) => {
-  if (currentDate) {
-    let closest = Infinity;
-
-    let allData = data.dygraph.file_;
-
-    return allData
-      .filter(elem => {
-        // get dates where this serie is not null
-        let elemDate = moment(elem[0]);
-
-        return (
-          elem[index + 1] !== null && Math.abs(currentDate.diff(elemDate)) <= 1000 * 60 * 60 * 24
-        );
-      })
-      .reduce((a, b) => {
-        let elemDate = moment(b[0]);
-        // show most recent values
-        let date = data.x ? moment(data.x) : moment();
-
-        let diff = Math.abs(date.diff(elemDate));
-
-        if (diff < closest) {
-          let val = b[index + 1] % 1 === 0 ? b[index + 1] : Number(b[index + 1]).toFixed(2);
-          a = { date: data.dygraph.user_attrs_.axes.x.valueFormatter(b[0]), value: val };
-          closest = diff;
-        }
-        return a;
-      }, {});
-  } else {
-    return {};
-  }
+ValueRenderer.propTypes = {
+  index: PropTypes.any,
+  isHighlighted: PropTypes.bool,
+  style: PropTypes.object,
+  isVisible: PropTypes.bool,
+  parseDateAsString: PropTypes.bool,
+  data: PropTypes.obj,
+  timezone: PropTypes.any,
+  dygraph: PropTypes.any,
+  isLocked: PropTypes.bool,
+  toggleLock: PropTypes.func,
+  x: PropTypes.any,
+  linkToSerie: PropTypes.any
 };
+
+// const getNearestPoint = (currentDate, data, index) => {
+//   if (currentDate) {
+//     let closest = Infinity;
+
+//     let allData = data.dygraph.file_;
+
+//     return allData
+//       .filter(elem => {
+//         // get dates where this serie is not null
+//         let elemDate = moment(elem[0]);
+
+//         return (
+//           elem[index + 1] !== null && Math.abs(currentDate.diff(elemDate)) <= 1000 * 60 * 60 * 24
+//         );
+//       })
+//       .reduce((a, b) => {
+//         let elemDate = moment(b[0]);
+//         // show most recent values
+//         let date = data.x ? moment(data.x) : moment();
+
+//         let diff = Math.abs(date.diff(elemDate));
+
+//         if (diff < closest) {
+//           let val = b[index + 1] % 1 === 0 ? b[index + 1] : Number(b[index + 1]).toFixed(2);
+//           a = { date: data.dygraph.user_attrs_.axes.x.valueFormatter(b[0]), value: val };
+//           closest = diff;
+//         }
+//         return a;
+//       }, {});
+//   } else {
+//     return {};
+//   }
+// };
 
 const checkSameValue = arr => {
   let highlighted = arr.find(v => v.isHighlighted);

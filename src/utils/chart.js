@@ -11,8 +11,8 @@ import moment from 'moment';
 import ChartLegendModal from '../components/ChartLegendModal/ChartLegendModal';
 
 const ChartUtils = {
-  getDefaultOptions: (timezone /*chartOptions*/) => {
-    // let legend_id = 12345678; //get random id
+  getDefaultOptions: ({ dispatch = null, timezone, chart_type } /*chartOptions*/) => {
+    let legend_id = 12345678; //get random id
     return {
       drawHighlightPointCallback: function(g, name, ctx, cx, cy, color, radius) {
         ctx.beginPath();
@@ -24,11 +24,13 @@ const ChartUtils = {
       },
       legend: 'follow',
       legendFormatter: data => {
-        //   AgronomeetStore.dispatch({
-        //       type: 'CHANGE_DATA',
-        //       data: { data, timezone, chartOptions },
-        //       legend_id: legend_id
-        //   });
+        if (dispatch) {
+          dispatch({
+            type: 'CHANGE_DATA',
+            data: { ...data, timezone }, // chartOptions
+            legend_id: legend_id
+          });
+        }
 
         //   let parseDateAsString = chartOptions
         //       ? chartOptions.comparison === 'xAxisFromDate' || chartOptions.comparison === 'xAxisFromMarker'
@@ -42,7 +44,7 @@ const ChartUtils = {
       xRangePad: 15,
       yRangePad: 15,
       drawGapEdgePoints: true,
-      highlightSeriesBackgroundAlpha: 0.3,
+      highlightSeriesBackgroundAlpha: chart_type === 'multi_column' ? 1 : 0.3,
       animatedZooms: true,
       // showRangeSelector: true,
       // showInRangeSelector: true,
