@@ -1,6 +1,6 @@
 {
   "name": "react-dyg",
-  "version": "1.0.9",
+  "version": "1.0.91",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
   "main": "./dist/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "generate:component": "node_modules/create-component-app/dist/index.js --template component --config ./config/templates/config.component.json",
     "generate:page": "node_modules/create-component-app/dist/index.js --template page --config ./config/templates/config.page.json"
   },
-  "author": "Giovanni Bieller",
+  "author": "Gianluca Solinas",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.10.2",
@@ -49,9 +49,7 @@
     "create-component-app": "^1.7.0",
     "webpack-dev-server": "^3.11.0"
   },
-  "dependencies": {
-    "classnames": "^2.2.6"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "jss-plugin-compose": "^10.3.0",
     "@fortawesome/fontawesome": "^1.1.8",
