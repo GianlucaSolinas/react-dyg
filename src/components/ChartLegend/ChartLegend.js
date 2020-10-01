@@ -308,13 +308,13 @@ const ValueRenderer = ({
           </div>
         ) : (
           <span
-            className="icon-hover"
-            onClick={() => {
-              if (!readonly) {
-                toggleEdit(true);
-              }
-            }}
-            title="Click to edit name"
+          // className="icon-hover"
+          // onClick={() => {
+          //   if (!readonly) {
+          //     toggleEdit(true);
+          //   }
+          // }}
+          // title="Click to edit name"
           >
             {label}
           </span>

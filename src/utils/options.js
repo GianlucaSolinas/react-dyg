@@ -3,6 +3,9 @@ import moment from 'moment';
 import Dygraph from 'dygraphs';
 
 const getChartOptions = ({ labelsDiv, chart_type, title, labels, dispatch, ...rest }) => {
+  const plugins = [];
+  plugins.push(ChartUtils.zoomOutOnRange);
+
   return {
     ...ChartUtils.getDefaultOptions({ chart_type, dispatch }),
     labelsDiv: labelsDiv.current,
@@ -19,7 +22,7 @@ const getChartOptions = ({ labelsDiv, chart_type, title, labels, dispatch, ...re
     //   : null,
     // visibility: visibleOnChart,
     // plotter: isMultiBar ? ChartUtils.multiColumnBarPlotter : null,
-    // plugins: plugins,
+    plugins: plugins,
     axes: {
       x: {
         valueFormatter: x => {

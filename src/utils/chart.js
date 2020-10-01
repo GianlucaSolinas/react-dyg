@@ -12,7 +12,7 @@ import ChartLegendModal from '../components/ChartLegendModal/ChartLegendModal';
 
 const ChartUtils = {
   getDefaultOptions: ({ dispatch = null, timezone, chart_type } /*chartOptions*/) => {
-    let legend_id = 12345678; //get random id
+    let legend_id = Date.now(); //get random id
     return {
       drawHighlightPointCallback: function(g, name, ctx, cx, cy, color, radius) {
         ctx.beginPath();

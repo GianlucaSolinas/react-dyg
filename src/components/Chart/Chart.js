@@ -52,7 +52,12 @@ const Chart = ({ data, options }) => {
 
   return (
     <div>
-      <ChartLegend data={state.data} legend_id={12345} dispatch={dispatch} chartOptions={options} />
+      <ChartLegend
+        data={state.data}
+        legend_id={Date.now()}
+        dispatch={dispatch}
+        chartOptions={options}
+      />
       <div className={classes.container} /*className="chart_container_graph"*/>
         <div
           ref={graphContainer}
