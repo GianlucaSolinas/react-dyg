@@ -58,6 +58,10 @@ const Styles = {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     textAlign: 'center'
+  },
+  square: {
+    width: '10px',
+    height: '10px'
   }
 };
 

@@ -160,6 +160,64 @@ const ChartUtils = {
       }
     }
   },
+  customBarPlotter(e) {
+    // We need to handle all the series simultaneously.
+    if (e.seriesIndex !== 0) return;
+
+    let current_series = e.dygraph.user_attrs_.series;
+    let current_serie = current_series[e.singleSeriesName];
+    let current_bar_series = Object.values(current_series).map(e => e.isBar);
+
+    var g = e.dygraph;
+    var ctx = e.drawingContext;
+
+    // filter series with isBar TODO
+    var sets = e.allSeriesPoints;
+
+    var y_bottom = e.dygraph.toDomYCoord(0);
+
+    // Find the minimum separation between x-values.
+    // This determines the bar width.
+    var min_sep = Infinity;
+    for (var j = 0; j < sets.length; j++) {
+      var points = sets[j];
+      for (var i = 1; i < points.length; i++) {
+        var sep = points[i].canvasx - points[i - 1].canvasx;
+        if (sep < min_sep) min_sep = sep;
+      }
+    }
+    var bar_width = Math.floor((2.0 / 3) * min_sep);
+
+    var fillColors = [];
+    var strokeColors = g.getColors();
+    for (var x = 0; x < strokeColors.length; x++) {
+      fillColors.push(darkenColor(strokeColors[x]));
+    }
+
+    for (var q = 0; q < sets.length; q++) {
+      if (current_bar_series[q]) {
+        ctx.fillStyle = fillColors[q];
+        ctx.strokeStyle = strokeColors[q];
+      } else {
+        ctx.fillStyle = 'transparent';
+        ctx.strokeStyle = 'transparent';
+      }
+      for (var w = 0; w < sets[q].length; w++) {
+        // e.dygraph.user_attrs_.series !!!
+        // check if isBar is true finding it from e.singleSeriesName or e.setName
+
+        if (current_serie && current_serie.isBar) {
+          var p = sets[q][w];
+          var center_x = p.canvasx;
+          var x_left = center_x - (bar_width / 2) * (1 - q / (sets.length - 1));
+
+          ctx.fillRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
+
+          ctx.strokeRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
+        }
+      }
+    }
+  },
   // timeShift(gpoints, time_shift) {
   //     return gpoints.map((elem, index) => {
   //         if (!time_shift) return elem;

@@ -19,6 +19,7 @@ module.exports = {
     semi: ['error', 'always'],
     'react/jsx-uses-vars': 1,
     'no-console': ['off'],
-    'prettier/prettier': 'error'
+    'prettier/prettier': 'error',
+    'no-unused-vars': 0
   }
 };

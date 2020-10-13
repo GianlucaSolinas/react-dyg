@@ -2,19 +2,48 @@ import ChartUtils from '@utils/chart';
 import moment from 'moment';
 import Dygraph from 'dygraphs';
 
-const getChartOptions = ({ labelsDiv, chart_type, title, labels, dispatch, ...rest }) => {
+const getChartOptions = ({
+  labelsDiv,
+  chart_type,
+  title,
+  labels = ['Date', 'value'],
+  dispatch,
+  seriesOptions = [],
+  ...rest
+}) => {
   const plugins = [];
   plugins.push(ChartUtils.zoomOutOnRange);
+
+  let has2axis = false;
+
+  let series_options = seriesOptions.reduce((acc, { title, chart_line }) => {
+    const isY2 = chart_line.slice(-2) === 'Y2';
+
+    if (isY2) {
+      has2axis = true;
+    }
+
+    acc[title] = {
+      plotter: chart_line === 'bar' ? ChartUtils.barChartPlotter : Dygraph.Plotters.linePlotter,
+      isBar: chart_line === 'bar',
+      axis: isY2 ? 'y2' : 'y1'
+    };
+    return acc;
+  }, {});
 
   return {
     ...ChartUtils.getDefaultOptions({ chart_type, dispatch }),
     labelsDiv: labelsDiv.current,
-    labels: labels || ['Date', 'value'],
+    labels: labels,
+    connectSeparatedPoints: true,
     ...(title && { title: title, titleHeight: 25 }),
     ...(chart_type === 'column' && { plotter: ChartUtils.barChartPlotter }),
     ...(chart_type === 'multi_column' && { plotter: ChartUtils.multiColumnBarPlotter }),
+    ...(seriesOptions.length && {
+      series: series_options
+    }),
+    ...(has2axis && { y2label: 'Percentage' }),
     ...rest,
-    // series: series_options,
     // dateWindow: dateWindow
     //   ? dateWindow
     //   : this.props.rangeDates
@@ -68,9 +97,27 @@ const getChartOptions = ({ labelsDiv, chart_type, title, labels, dispatch, ...re
         }
       },
       y: {
+        valueFormatter: (x, opts, seriesName, dygraph, row, col) => {
+          let serie = seriesOptions.find(({ title }) => seriesName === title);
+
+          if (serie) {
+            return `${parseFloat(x.toPrecision(2))} ${serie.symbol}`;
+          } else {
+            return parseFloat(x.toPrecision(2));
+          }
+        }
         // valueRange: [minValueRangeY, maxValueRangeY]
       },
       y2: {
+        valueFormatter: (x, opts, seriesName, dygraph, row, col) => {
+          let serie = seriesOptions.find(({ title }) => seriesName === title);
+
+          if (serie) {
+            return `${parseFloat(x.toPrecision(2))} ${serie.symbol}`;
+          } else {
+            return parseFloat(x.toPrecision(2));
+          }
+        },
         // valueRange: [minValueRangeY2, maxValueRangeY2],
         independentTicks: true
       }

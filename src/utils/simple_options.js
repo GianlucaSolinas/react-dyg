@@ -2,7 +2,15 @@ import ChartUtils from '@utils/chart';
 import moment from 'moment';
 import Dygraph from 'dygraphs';
 
-const getSimpleOptions = ({ labelsDiv, chart_type, title, labels, ...rest }) => {
+const getSimpleOptions = ({
+  labelsDiv,
+  chart_type,
+  title,
+  labels = ['Date', 'value'],
+  dispatch,
+  seriesOptions = [],
+  ...rest
+}) => {
   return {
     ...ChartUtils.getDefaultOptions({ chart_type }),
     labels: labels || ['Date', 'value'],
@@ -58,6 +66,31 @@ const getSimpleOptions = ({ labelsDiv, chart_type, title, labels, ...rest }) => 
           return Dygraph.dateAxisLabelFormatter(x, granularity, opts);
           //   // }
         }
+      },
+      y: {
+        valueFormatter: (x, opts, seriesName, dygraph, row, col) => {
+          let serie = seriesOptions.find(({ title }) => seriesName === title);
+
+          if (serie) {
+            return `${parseFloat(x.toPrecision(2))} ${serie.symbol}`;
+          } else {
+            return parseFloat(x.toPrecision(2));
+          }
+        }
+        // valueRange: [minValueRangeY, maxValueRangeY]
+      },
+      y2: {
+        valueFormatter: (x, opts, seriesName, dygraph, row, col) => {
+          let serie = seriesOptions.find(({ title }) => seriesName === title);
+
+          if (serie) {
+            return `${parseFloat(x.toPrecision(2))} ${serie.symbol}`;
+          } else {
+            return parseFloat(x.toPrecision(2));
+          }
+        },
+        // valueRange: [minValueRangeY2, maxValueRangeY2],
+        independentTicks: true
       }
     }
     // ...(timezone && {
