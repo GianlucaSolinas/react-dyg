@@ -1,6 +1,6 @@
 {
   "name": "react-dyg",
-  "version": "1.0.99",
+  "version": "1.1.0",
   "description": "Init React app with: webpack, wepback-dev-server, eslint, jss, proptypes, babel, react-router 4 with code splitting",
   "main": "./dist/index.js",
   "scripts": {

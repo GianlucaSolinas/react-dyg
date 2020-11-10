@@ -10,6 +10,83 @@ import moment from 'moment';
 // import AgronomeetStore from '../../../client/store';
 import ChartLegendModal from '../components/ChartLegendModal/ChartLegendModal';
 
+const stackPoints = (points, cumulativeYval, seriesExtremes, fillMethod) => {
+  let lastXval = null;
+  let prevPoint = null;
+  let nextPoint = null;
+  let nextPointIdx = -1;
+
+  // Find the next stackable point starting from the given index.
+  let updateNextPoint = function(idx) {
+    // If we've previously found a non-NaN point and haven't gone past it yet,
+    // just use that.
+    if (nextPointIdx >= idx) return;
+
+    // We haven't found a non-NaN point yet or have moved past it,
+    // look towards the right to find a non-NaN point.
+    for (let j = idx; j < points.length; ++j) {
+      // Clear out a previously-found point (if any) since it's no longer
+      // valid, we shouldn't use it for interpolation anymore.
+      nextPoint = null;
+      if (!isNaN(points[j].yval) && points[j].yval !== null) {
+        nextPointIdx = j;
+        nextPoint = points[j];
+        break;
+      }
+    }
+  };
+
+  for (let i = 0; i < points.length; ++i) {
+    let point = points[i];
+    let xval = point.xval;
+    if (cumulativeYval[xval] === undefined) {
+      cumulativeYval[xval] = 0;
+    }
+
+    let actualYval = point.yval;
+    if (isNaN(actualYval) || actualYval === null) {
+      if (fillMethod == 'none') {
+        actualYval = 0;
+      } else {
+        // Interpolate/extend for stacking purposes if possible.
+        updateNextPoint(i);
+        if (prevPoint && nextPoint && fillMethod != 'none') {
+          // Use linear interpolation between prevPoint and nextPoint.
+          actualYval =
+            prevPoint.yval +
+            (nextPoint.yval - prevPoint.yval) *
+              ((xval - prevPoint.xval) / (nextPoint.xval - prevPoint.xval));
+        } else if (prevPoint && fillMethod == 'all') {
+          actualYval = prevPoint.yval;
+        } else if (nextPoint && fillMethod == 'all') {
+          actualYval = nextPoint.yval;
+        } else {
+          actualYval = 0;
+        }
+      }
+    } else {
+      prevPoint = point;
+    }
+
+    let stackedYval = cumulativeYval[xval];
+    if (lastXval != xval) {
+      // If an x-value is repeated, we ignore the duplicates.
+      stackedYval += actualYval;
+      cumulativeYval[xval] = stackedYval;
+    }
+    lastXval = xval;
+
+    point.yval_stacked = stackedYval;
+
+    if (stackedYval > seriesExtremes[1]) {
+      seriesExtremes[1] = stackedYval;
+    }
+    if (stackedYval < seriesExtremes[0]) {
+      seriesExtremes[0] = stackedYval;
+    }
+  }
+};
+
 const ChartUtils = {
   getDefaultOptions: ({ dispatch = null, timezone, chart_type } /*chartOptions*/) => {
     let legend_id = Date.now(); //get random id
@@ -123,40 +200,182 @@ const ChartUtils = {
     // We need to handle all the series simultaneously.
     if (e.seriesIndex !== 0) return;
 
-    var g = e.dygraph;
-    var ctx = e.drawingContext;
-    var sets = e.allSeriesPoints;
-    var y_bottom = e.dygraph.toDomYCoord(0);
+    let g = e.dygraph;
+    let ctx = e.drawingContext;
+    let sets = e.allSeriesPoints;
+    let y_bottom = e.dygraph.toDomYCoord(0);
 
     // Find the minimum separation between x-values.
     // This determines the bar width.
-    var min_sep = Infinity;
-    for (var j = 0; j < sets.length; j++) {
-      var points = sets[j];
-      for (var i = 1; i < points.length; i++) {
-        var sep = points[i].canvasx - points[i - 1].canvasx;
+    let min_sep = Infinity;
+    for (let j = 0; j < sets.length; j++) {
+      let points = sets[j];
+      for (let i = 1; i < points.length; i++) {
+        let sep = points[i].canvasx - points[i - 1].canvasx;
         if (sep < min_sep) min_sep = sep;
       }
     }
-    var bar_width = Math.floor((2.0 / 3) * min_sep);
+    let bar_width = Math.floor((2.0 / 3) * min_sep);
+    let fillColors = [];
+    let strokeColors = g.getColors();
 
-    var fillColors = [];
-    var strokeColors = g.getColors();
-    for (var x = 0; x < strokeColors.length; x++) {
-      fillColors.push(darkenColor(strokeColors[x]));
-    }
+    if (sets.length === 1) {
+      let color = strokeColors[0];
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
 
-    for (var q = 0; q < sets.length; q++) {
-      ctx.fillStyle = fillColors[q];
-      ctx.strokeStyle = strokeColors[q];
-      for (var w = 0; w < sets[q].length; w++) {
-        var p = sets[q][w];
-        var center_x = p.canvasx;
-        var x_left = center_x - (bar_width / 2) * (1 - q / (sets.length - 1));
+      for (let count = 0; count < sets[0].length; count++) {
+        let p = sets[0][count];
+        let center_x = p.canvasx;
+        let x_left = center_x - bar_width / 2;
 
         ctx.fillRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
 
         ctx.strokeRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
+      }
+    } else {
+      for (let x = 0; x < strokeColors.length; x++) {
+        fillColors.push(darkenColor(strokeColors[x]));
+      }
+
+      for (let q = 0; q < sets.length; q++) {
+        ctx.fillStyle = fillColors[q];
+        ctx.strokeStyle = strokeColors[q];
+        for (let w = 0; w < sets[q].length; w++) {
+          let p = sets[q][w];
+          let center_x = p.canvasx;
+          let x_left = center_x - (bar_width / 2) * (1 - q / (sets.length - 1));
+
+          ctx.fillRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
+
+          ctx.strokeRect(x_left, p.canvasy, bar_width / sets.length, y_bottom - p.canvasy);
+        }
+      }
+    }
+  },
+  //extracting and reducing the Dygraph.stackPoints_ function
+  stackedBarChartPlotter(e) {
+    const calcYNormal_ = (axis, value, logscale) => {
+      if (logscale) {
+        var x = 1.0 - (Math.log10(value) - Math.log10(axis.minyval)) * axis.ylogscale;
+        return isFinite(x) ? x : NaN; // shim for v8 issue; see pull request 276
+      } else {
+        return 1.0 - (value - axis.minyval) * axis.yscale;
+      }
+    };
+    // We need to handle all the series simultaneously.
+    if (e.seriesIndex !== 0) return;
+
+    let g = e.dygraph;
+    let ctx = e.drawingContext;
+    let sets = e.allSeriesPoints;
+    let y_bottom = e.dygraph.toDomYCoord(0);
+
+    let setNames = g.getLabels().slice(1); // remove x-axis
+
+    let points = e.points;
+    let minIdx = Infinity;
+
+    let fillColors = [];
+    let strokeColors = g.getColors();
+    for (let i = 0; i < strokeColors.length; i++) {
+      fillColors.push(strokeColors[i]);
+    }
+
+    let seriesExtremes = [];
+
+    let tmpExtremes = [];
+    tmpExtremes[0] = Infinity;
+    tmpExtremes[1] = -Infinity;
+    for (let j = 0; j < sets.length; j++) {
+      seriesExtremes.push(tmpExtremes);
+    }
+
+    // Find the minimum separation between x-values.
+    // This determines the bar width.
+    points = sets[0];
+
+    let min_sep = Infinity;
+    for (let i = 1; i < points.length; i++) {
+      let sep = points[i].canvasx - points[i - 1].canvasx;
+      if (sep < min_sep) min_sep = sep;
+    }
+    let bar_width = Math.floor((2.0 / 3) * min_sep);
+
+    // set up cumulative records
+    let cumulativeYval = [];
+    let packed = g.gatherDatasets_(g.rolledSeries_, null);
+    let extremes = packed.extremes;
+    let seriesName;
+
+    for (let j = sets.length - 1; j >= 0; j--) {
+      points = sets[j];
+      seriesName = setNames[j];
+
+      //  stack the data
+      stackPoints(
+        points,
+        cumulativeYval,
+        seriesExtremes[j],
+        g.getBooleanOption('stackedGraphNaNFill')
+      );
+
+      extremes[seriesName] = seriesExtremes[j];
+    }
+
+    // There is currently no way to update the axes height from inside the plotter...
+    // Will have to wait until update can be made to underlying dygraphs lib
+    // Preferring to do issue or pull request to main library on github instead of modifying here
+    // g.computeYAxisRanges_(extremes);
+    // g.layout_.setYAxes(g.axes_);
+    let axis;
+    let logscale;
+    let connectSeparated;
+
+    // Do the actual plotting.
+    for (let j = 0; j < sets.length; j++) {
+      seriesName = setNames[j];
+      connectSeparated = g.getOption('connectSeparatedPoints', seriesName);
+      logscale = g.attributes_.getForSeries('logscale', seriesName);
+
+      axis = g.axisPropertiesForSeries(seriesName);
+
+      points = sets[j];
+
+      for (let i = 0; i < points.length; i++) {
+        let point = points[i];
+
+        let yval = point.yval;
+
+        point.y_stacked = calcYNormal_(axis, point.yval_stacked, logscale);
+
+        if (yval !== null && !isNaN(yval)) {
+          yval = point.yval_stacked;
+        }
+        if (yval === null) {
+          yval = NaN;
+          if (!connectSeparated) {
+            point.yval = NaN;
+          }
+        }
+        point.y = calcYNormal_(axis, yval, logscale);
+
+        point.canvasx = g.plotter_.area.w * point.x + g.plotter_.area.x;
+        point.canvasy = g.plotter_.area.h * point.y + g.plotter_.area.y;
+
+        let center_x = point.canvasx;
+
+        ctx.fillStyle = fillColors[j];
+        ctx.strokeStyle = fillColors[j];
+
+        ctx.fillRect(center_x - bar_width / 2, point.canvasy, bar_width, y_bottom - point.canvasy);
+
+        ctx.strokeRect(
+          center_x - bar_width / 2,
+          point.canvasy,
+          bar_width,
+          y_bottom - point.canvasy
+        );
       }
     }
   },
