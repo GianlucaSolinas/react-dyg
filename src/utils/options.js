@@ -16,17 +16,50 @@ const getChartOptions = ({
 
   let has2axis = false;
 
-  let series_options = seriesOptions.reduce((acc, { title, chart_line }) => {
+  let series_options = seriesOptions.reduce((acc, { title, chart_line, chart_point = null }) => {
     const isY2 = chart_line.slice(-2) === 'Y2';
 
     if (isY2) {
       has2axis = true;
     }
 
+    const drawPointCallback = function(graph, seriesName, ctx, cx, cy, color, pointSize, idx) {
+      let yValue = graph.toDataYCoord(cy);
+      if (isY2 && !isNaN(cy)) {
+        yValue = graph.toDataY2Coord(cy);
+      }
+      let aLength = 5;
+      let aWidth = 5;
+      var length = 10;
+
+      // minus 90 because the rotation starts from (EAST/90degrees/RIGHT)
+      var angle = ((yValue - 90) * Math.PI) / 180;
+
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(length, 0);
+
+      ctx.moveTo(length - aLength, -aWidth);
+      ctx.lineTo(length, 0);
+      ctx.lineTo(length - aLength, aWidth);
+
+      ctx.stroke();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    };
+
     acc[title] = {
       plotter: chart_line === 'bar' ? ChartUtils.barChartPlotter : Dygraph.Plotters.linePlotter,
       isBar: chart_line === 'bar',
-      axis: isY2 ? 'y2' : 'y1'
+      axis: isY2 ? 'y2' : 'y1',
+      ...(chart_point &&
+        chart_point === 'direction' && {
+          drawPointCallback: drawPointCallback,
+          drawPoints: true,
+          strokeWidth: 0
+        })
     };
     return acc;
   }, {});

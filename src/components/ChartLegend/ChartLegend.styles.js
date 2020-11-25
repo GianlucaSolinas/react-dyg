@@ -11,7 +11,7 @@ const Styles = {
     overflowY: 'auto',
     position: 'relative',
     display: 'inline-block',
-    width: '20%'
+    width: '100%'
   },
   chart_title: {
     textAlign: 'center',
@@ -26,17 +26,21 @@ const Styles = {
   },
   chart_row: {
     padding: '5px',
-    borderTop: '1px solid #999999', // borders color
-    borderBottom: '1px solid #999999', // borders color
+    border: '1px solid #999999',
     maxHeight: '140px',
+    width: '30%',
+    margin: '16px',
+    display: 'inline-block',
     '&.highlighted': {
       fontWeight: 'bold',
-      background: '#eee'
+      background: '#eee',
+      borderWidth: '2px'
     }
   },
   chart_label: {
     wordBreak: 'break-all',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: '14px'
   },
   value_container: {
     display: 'flex',
@@ -62,6 +66,14 @@ const Styles = {
   square: {
     width: '10px',
     height: '10px'
+  },
+  action_container: {
+    position: 'relative',
+    textAlign: 'center',
+    cursor: 'pointer'
+  },
+  action_text: {
+    fontSize: '10px'
   }
 };
 

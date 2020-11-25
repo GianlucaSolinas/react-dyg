@@ -24,6 +24,7 @@ const Chart = ({ data, options }) => {
 
   const [chart, setChart] = useState(null);
   const [hiddenGraph, hideGraph] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const [state, dispatch] = useReducer(reducer, { data: {} });
 
@@ -32,6 +33,7 @@ const Chart = ({ data, options }) => {
 
   useEffect(() => {
     if (graphContainer && data.length) {
+      setLoading(true);
       setChart(
         new Dygraph(graphContainer.current, data, {
           ...getChartOptions({ labelsDiv, ...options, chart, dispatch })
@@ -39,9 +41,11 @@ const Chart = ({ data, options }) => {
       );
 
       if (chart) {
+        setLoading(false);
         hideGraph(false);
       }
     } else {
+      setLoading(false);
       hideGraph(true);
     }
 
@@ -52,12 +56,7 @@ const Chart = ({ data, options }) => {
 
   return (
     <div>
-      <ChartLegend
-        data={state.data}
-        legend_id={Date.now()}
-        dispatch={dispatch}
-        chartOptions={options}
-      />
+      {loading && <div>Loading...</div>}
       <div className={classes.container} /*className="chart_container_graph"*/>
         <div
           ref={graphContainer}
@@ -71,7 +70,22 @@ const Chart = ({ data, options }) => {
         />
         <div className={classes[legendClass]} ref={labelsDiv} style={chart ? {} : { opacity: 0 }} />
       </div>
-      {hiddenGraph && <div>No data available for any serie</div>}
+      {!hiddenGraph && (
+        <ChartLegend
+          data={state.data}
+          legend_id={Date.now()}
+          dispatch={dispatch}
+          chartOptions={options}
+        />
+      )}
+      {!loading && hiddenGraph && (
+        <div className={classes.infopanel}>
+          <span className={classes.infoicon}>
+            <i className="fas fa-info-circle" />
+          </span>
+          No data available for the selected range.
+        </div>
+      )}
     </div>
   );
 };

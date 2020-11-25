@@ -4,7 +4,7 @@ import { graphStyles } from '@utils/styles';
 const Styles = {
   graphStyles,
   container: {
-    width: '80%',
+    width: '100%',
     display: 'inline-block'
   },
   legend_hover: {
@@ -12,6 +12,12 @@ const Styles = {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     zIndex: '999 !important',
     minWidth: '30%'
+  },
+  infopanel: {
+    textAlign: 'center'
+  },
+  infoicon: {
+    margin: '8px'
   }
 };
 

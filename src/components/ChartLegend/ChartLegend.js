@@ -334,28 +334,38 @@ const ValueRenderer = ({
       )}
       <div className={classes.actions_container}>
         {!readonly && (
-          <i
-            className={classNames('fas icon-hover icon-margin inline_block', {
-              'fa-eye': isVisible,
-              'fa-eye-slash': !isVisible
-            })}
+          <div
+            className={classes.action_container}
             onClick={() => {
               if (isLocked) toggleLock(index);
               dygraph.setVisibility(index, !isVisible);
             }}
-            title={isVisible ? 'Hide' : 'Show'}
-          />
+          >
+            <i
+              className={classNames('fas fa-lg icon-hover icon-margin inline_block', {
+                'fa-eye': isVisible,
+                'fa-eye-slash': !isVisible
+              })}
+              title={isVisible ? 'Hide' : 'Show'}
+            />
+            <div className={classes.action_text}>{isVisible ? 'HIDE' : 'SHOW'}</div>
+          </div>
         )}
 
         {isVisible && !readonly && (
-          <i
-            className={classNames('fas icon-hover icon-margin inline_block', {
-              'fa-lock': isLocked,
-              'fa-lock-open': !isLocked
-            })}
+          <div
+            className={classes.action_container}
             onClick={() => toggleLock(index, dygraph.getRowForX(moment(x)), data.label)}
-            title={isLocked ? 'Unlock' : 'Lock'}
-          />
+          >
+            <i
+              className={classNames('fas fa-lg icon-hover icon-margin inline_block', {
+                'fa-lock': isLocked,
+                'fa-lock-open': !isLocked
+              })}
+              title={isLocked ? 'Unlock' : 'Lock'}
+            />
+            <div className={classes.action_text}>{isLocked ? 'UNLOCK' : 'LOCK'}</div>
+          </div>
         )}
         {linkToSerie && (
           <i
