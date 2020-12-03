@@ -4,7 +4,7 @@ import { graphStyles } from '@utils/styles';
 const Styles = {
   graphStyles,
   container: {
-    width: '100%',
+    width: '80%',
     display: 'inline-block'
   },
   legend_hover: {

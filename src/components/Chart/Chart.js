@@ -57,6 +57,14 @@ const Chart = ({ data, options }) => {
   return (
     <div>
       {loading && <div>Loading...</div>}
+      {!hiddenGraph && (
+        <ChartLegend
+          data={state.data}
+          legend_id={Date.now()}
+          dispatch={dispatch}
+          chartOptions={options}
+        />
+      )}
       <div className={classes.container} /*className="chart_container_graph"*/>
         <div
           ref={graphContainer}
@@ -70,14 +78,6 @@ const Chart = ({ data, options }) => {
         />
         <div className={classes[legendClass]} ref={labelsDiv} style={chart ? {} : { opacity: 0 }} />
       </div>
-      {!hiddenGraph && (
-        <ChartLegend
-          data={state.data}
-          legend_id={Date.now()}
-          dispatch={dispatch}
-          chartOptions={options}
-        />
-      )}
       {!loading && hiddenGraph && (
         <div className={classes.infopanel}>
           <span className={classes.infoicon}>
